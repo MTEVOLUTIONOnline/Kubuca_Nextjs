@@ -1,10 +1,10 @@
 import { getServerSession } from 'next-auth'
-import { authOptions } from '@/app/api/auth/[...nextauth]/route'
 import { prisma } from '@/lib/prisma'
 import { redirect } from 'next/navigation'
 import DashboardStats from '@/app/components/dashboard/DashboardStats'
 import ProductList from '@/app/components/dashboard/ProductList'
 import Link from 'next/link'
+import { authOptions } from '@/app/api/auth'
 
 export default async function DashboardPage() {
   const session = await getServerSession(authOptions)

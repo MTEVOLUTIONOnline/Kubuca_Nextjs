@@ -58,13 +58,13 @@ export default function ProductList({ courses }: { courses: CourseWithStats[] })
 
               <div className="flex space-x-3">
                 <Link
-                  href={`/dashboard/courses/${course.courseId}/modules`}
+                  href={`/dashboard/products/courses/${course.id}/modules`}
                   className="flex-1 bg-blue-500 text-white text-center py-2 px-4 rounded hover:bg-blue-600 transition"
                 >
                   Gerenciar
                 </Link>
                 <Link
-                  href={`/dashboard/courses/${course.courseId}/purchases`}
+                  href={`/dashboard/products/courses/${course.id}/purchases`}
                   className="flex-1 bg-gray-100 text-gray-700 text-center py-2 px-4 rounded hover:bg-gray-200 transition"
                 >
                   Vendas
@@ -76,7 +76,7 @@ export default function ProductList({ courses }: { courses: CourseWithStats[] })
       })}
 
       <Link
-        href="/dashboard/courses/create"
+        href="/dashboard/products/add"
         className="flex flex-col items-center justify-center p-6 border-2 border-dashed border-gray-300 rounded-lg hover:border-gray-400 transition"
       >
         <div className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center mb-2">
@@ -94,7 +94,7 @@ export default function ProductList({ courses }: { courses: CourseWithStats[] })
             />
           </svg>
         </div>
-        <span className="text-gray-600">Criar Novo Curso</span>
+        <span className="text-gray-600">Criar Novo Produto</span>
       </Link>
     </div>
   )

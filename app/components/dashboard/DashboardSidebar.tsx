@@ -7,8 +7,13 @@ import {
   BookOpen,
   ShoppingBag,
   GraduationCap,
-  LogOut
+  LogOut,
+  Book,
+  ShoppingCart,
+  ChevronDown,
+  ChevronRight
 } from 'lucide-react'
+import { useState } from 'react'
 
 const menuItems = [
   {
@@ -17,9 +22,9 @@ const menuItems = [
     icon: <LayoutDashboard className="w-5 h-5" />
   },
   {
-    label: 'Meus Cursos',
-    href: '/dashboard/courses',
-    icon: <BookOpen className="w-5 h-5" />
+    label: 'Produtos',
+    href: '/dashboard/products',
+    icon: <BookOpen className="w-5 h-5" />,
   },
   {
     label: 'Marketplace',
@@ -63,6 +68,9 @@ const menuItems = [
 export default function DashboardSidebar() {
   const pathname = usePathname()
   const { data: session } = useSession()
+  const [isProductsOpen, setIsProductsOpen] = useState(true)
+
+  const isActive = (path: string) => pathname === path
 
   return (
     <div className="h-full flex flex-col">
@@ -95,6 +103,7 @@ export default function DashboardSidebar() {
             )
           })}
         </ul>
+
       </nav>
 
       {/* Perfil e Logout */}

@@ -1,0 +1,5 @@
+node_modules/
+.next/
+build/
+dist/ 
+.next/types/app/api/auth/[...nextauth]/route.ts

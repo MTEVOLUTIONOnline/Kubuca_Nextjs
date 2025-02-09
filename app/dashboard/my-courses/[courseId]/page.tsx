@@ -1,9 +1,9 @@
 import { getServerSession } from 'next-auth'
-import { authOptions } from '@/app/api/auth/[...nextauth]/route'
 import { prisma } from '@/lib/prisma'
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import CourseContent from '@/app/components/my-courses/CourseContent'
+import { authOptions } from '@/app/api/auth'
 
 export default async function CourseView({
   params

@@ -1,5 +1,6 @@
 import { getServerSession } from 'next-auth'
-import { authOptions } from '@/app/api/auth/[...nextauth]/route'
+import { authOptions } from '@/app/api/auth/auth.config'
+
 import { prisma } from '@/lib/prisma'
 import { redirect } from 'next/navigation'
 import PortfolioStats from '@/app/components/dashboard/PortfolioStats'

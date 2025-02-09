@@ -1,5 +1,5 @@
 import { getServerSession } from 'next-auth'
-import { authOptions } from '@/app/api/auth/[...nextauth]/route'
+import { authOptions } from '@/app/api/auth'
 import { prisma } from '@/lib/prisma'
 import { notFound } from 'next/navigation'
 import PaymentMethods from '@/app/components/payment/PaymentMethods'

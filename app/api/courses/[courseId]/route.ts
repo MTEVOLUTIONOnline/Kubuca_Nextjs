@@ -1,19 +1,17 @@
 import { NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
-import { authOptions } from '../../auth/[...nextauth]/route'
+import { authOptions } from '@/app/api/auth'
 import { prisma } from '@/lib/prisma'
 
-// ... outros métodos ...
-
 export async function DELETE(
-  request: Request,
-  { params }: { params: { courseId: string } }
+  request: Request, // Adicione o parâmetro `request` (obrigatório no Next.js)
+  { params }: { params: { courseId: string } } // Extraia `params` diretamente
 ) {
   try {
-    const session = await getServerSession(authOptions);
-
+    const session = await getServerSession(authOptions)
+    
     if (!session?.user) {
-      return NextResponse.json({ error: 'Não autorizado' }, { status: 401 });
+      return NextResponse.json({ error: 'Não autorizado' }, { status: 401 })
     }
 
     const user = await prisma.user.findUnique({
@@ -26,7 +24,7 @@ export async function DELETE(
 
     const course = await prisma.course.findFirst({
       where: {
-        id: params.courseId,
+        id: params.courseId, // Use `params.courseId` diretamente
         instructorId: user.id
       }
     });
@@ -42,7 +40,7 @@ export async function DELETE(
         where: {
           lesson: {
             module: {
-              courseId: params.courseId
+              courseId: params.courseId // Use `params.courseId` diretamente
             }
           }
         }
@@ -50,7 +48,7 @@ export async function DELETE(
 
       // 2. Excluir aulas
       const modules = await tx.module.findMany({
-        where: { courseId: params.courseId },
+        where: { courseId: params.courseId }, // Use `params.courseId` diretamente
         select: { id: true }
       });
 
@@ -66,24 +64,24 @@ export async function DELETE(
 
       // 3. Excluir módulos
       await tx.module.deleteMany({
-        where: { courseId: params.courseId }
+        where: { courseId: params.courseId } // Use `params.courseId` diretamente
       });
 
       // 4. Excluir links de afiliados
       await tx.affiliate.deleteMany({
-        where: { courseId: params.courseId }
+        where: { courseId: params.courseId } // Use `params.courseId` diretamente
       });
 
       // 5. Marcar compras como deletadas
       await tx.purchase.updateMany({
-        where: { courseId: params.courseId },
+        where: { courseId: params.courseId }, // Use `params.courseId` diretamente
         data: { status: 'deleted' }
       });
     });
 
     // Depois, excluir o curso
     await prisma.course.delete({
-      where: { id: params.courseId }
+      where: { id: params.courseId } // Use `params.courseId` diretamente
     });
 
     return NextResponse.json({ message: 'Curso deletado com sucesso' });

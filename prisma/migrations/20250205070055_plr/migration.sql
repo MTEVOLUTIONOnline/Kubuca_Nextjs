@@ -1,0 +1,25 @@
+-- CreateTable
+CREATE TABLE "PLR" (
+    "id" TEXT NOT NULL PRIMARY KEY,
+    "courseId" TEXT NOT NULL,
+    "type" TEXT NOT NULL,
+    "price" REAL NOT NULL,
+    "terms" TEXT NOT NULL,
+    "active" BOOLEAN NOT NULL DEFAULT true,
+    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" DATETIME NOT NULL,
+    CONSTRAINT "PLR_courseId_fkey" FOREIGN KEY ("courseId") REFERENCES "Course" ("id") ON DELETE RESTRICT ON UPDATE CASCADE
+);
+
+-- CreateTable
+CREATE TABLE "PLRPurchase" (
+    "id" TEXT NOT NULL PRIMARY KEY,
+    "plrId" TEXT NOT NULL,
+    "userId" TEXT NOT NULL,
+    "status" TEXT NOT NULL,
+    "price" REAL NOT NULL,
+    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" DATETIME NOT NULL,
+    CONSTRAINT "PLRPurchase_plrId_fkey" FOREIGN KEY ("plrId") REFERENCES "PLR" ("id") ON DELETE RESTRICT ON UPDATE CASCADE,
+    CONSTRAINT "PLRPurchase_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User" ("id") ON DELETE RESTRICT ON UPDATE CASCADE
+);

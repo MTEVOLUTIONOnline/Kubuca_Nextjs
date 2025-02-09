@@ -1,8 +1,8 @@
 import { getServerSession } from 'next-auth'
-import { authOptions } from '@/app/api/auth/[...nextauth]/route'
 import { prisma } from '@/lib/prisma'
 import { notFound } from 'next/navigation'
 import PurchasedCourseCard from '@/app/components/my-courses/PurchasedCourseCard'
+import { authOptions } from '@/app/api/auth'
 
 export default async function MyCourses() {
   const session = await getServerSession(authOptions)

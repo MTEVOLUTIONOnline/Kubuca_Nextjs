@@ -26,7 +26,12 @@ model User {
   affiliateLinks     Affiliate[]  // Links de afiliado que o usuário possui
   affiliateEarnings  Float        @default(0) // Ganhos totais como afiliado
   balance           Float    @default(0) // Adicionado campo de saldo
+  plrPurchases      PLRPurchase[] // Adicionando relação inversa
+  plr      PLR[] // Adicionando relação inversa
+  plrAffiliates    PLRAffiliate[]  // Adicionar esta linha
 }
+
+// PLR
 
 model Course {
   id           String    @id @default(cuid())
@@ -65,6 +70,7 @@ model Lesson {
   progress    LessonProgress[]
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
+  duration    Int?
 }
 
 model Purchase {
@@ -115,4 +121,54 @@ model Affiliate {
   updatedAt     DateTime  @updatedAt
 
   @@unique([userId, courseId])
+}
+
+enum PLRType {
+  EBOOK     // Alterado para EBOOK
+}
+
+model PLR {
+  id                String   @id @default(cuid())
+  userId            String   
+  user              User     @relation(fields: [userId], references: [id])
+  type              PLRType  @default(EBOOK)
+  price             Float    
+  terms             String   
+  ebookUrls         String   
+  title             String   
+  description       String   
+  thumbnailUrl      String?  
+  active            Boolean  @default(true)
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  purchases         PLRPurchase[]
+  affiliateCommission Float    @default(0)
+  affiliates        PLRAffiliate[]
+}
+
+model PLRPurchase {
+  id          String   @id @default(cuid())
+  plrId       String
+  plr         PLR      @relation(fields: [plrId], references: [id])
+  userId      String
+  user        User     @relation(fields: [userId], references: [id])
+  status      String   // pending, completed, cancelled
+  price       Float
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+// Novo modelo para afiliados de PLR
+model PLRAffiliate {
+  id            String    @id @default(cuid())
+  userId        String
+  plrId         String
+  affiliateCode String    @unique
+  user          User      @relation(fields: [userId], references: [id])
+  plr           PLR       @relation(fields: [plrId], references: [id])
+  earnings      Float     @default(0)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  @@unique([userId, plrId])
 }

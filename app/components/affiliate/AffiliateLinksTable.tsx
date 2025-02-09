@@ -2,31 +2,45 @@
 import { useState } from 'react'
 import { Course, Affiliate } from '@prisma/client'
 
-type AffiliateWithDetails = Affiliate & {
-  course: Course
+
+type AffiliateWithDetails = {
+  id: string;
+  affiliateCode: string;
+  userId: string;
+  courseId?: string; // Opcional, pois pode ser um link de ebook
+  plrId?: string; // Opcional, pois pode ser um link de curso
+  type: 'course' | 'ebook'; // Tipo para identificar se é curso ou ebook
+  course?: Course; // Dados do curso (se for um link de curso)
+  plr?: {
+    id: string;
+    title: string;
+    description: string;
+    thumbnailUrl: string;
+    price: number;
+    affiliateCommission: number;
+  }; // Dados do ebook (se for um link de ebook)
   _count: {
-    purchases: number
-  }
-}
+    purchases: number;
+  };
+  earnings: number; // Adicione isso se necessário
+};
 
-export default function AffiliateLinksTable({ 
-  links 
-}: { 
-  links: AffiliateWithDetails[] 
-}) {
-  const [copiedId, setCopiedId] = useState<string | null>(null)
+export default function AffiliateLinksTable({ links }: { links: AffiliateWithDetails[] }) {
+  const [copiedId, setCopiedId] = useState<string | null>(null);
 
-  const handleCopy = async (affiliateCode: string, courseId: string) => {
-    const affiliateLink = `${process.env.NEXT_PUBLIC_APP_URL}/courses/${courseId}/checkout?ref=${affiliateCode}`
-    
+  const handleCopy = async (affiliateCode: string, productId: string, type: 'course' | 'ebook') => {
+    const affiliateLink = `${process.env.NEXT_PUBLIC_APP_URL}/${
+      type === 'course' ? 'courses' : 'ebooks'
+    }/${productId}/checkout?ref=${affiliateCode}`;
+
     try {
-      await navigator.clipboard.writeText(affiliateLink)
-      setCopiedId(affiliateCode)
-      setTimeout(() => setCopiedId(null), 2000)
+      await navigator.clipboard.writeText(affiliateLink);
+      setCopiedId(affiliateCode);
+      setTimeout(() => setCopiedId(null), 2000);
     } catch (err) {
-      console.error('Erro ao copiar:', err)
+      console.error('Erro ao copiar:', err);
     }
-  }
+  };
 
   return (
     <div className="bg-white rounded-lg shadow overflow-hidden">
@@ -35,7 +49,7 @@ export default function AffiliateLinksTable({
           <thead className="bg-gray-50">
             <tr>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Curso
+                Produto
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 Comissão
@@ -52,20 +66,23 @@ export default function AffiliateLinksTable({
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
+            {/* link._count.purchases */}
             {links.map((link) => {
-              const potentialEarnings = (link.course.price * link.course.affiliateCommission) / 100
+              const product = link.type === 'course' ? link.course : link.plr;
+              const potentialEarnings =
+                ((product?.price || 0) * (product?.affiliateCommission || 0)) / 100;
 
               return (
                 <tr key={link.id} className="hover:bg-gray-50">
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div>
                       <div className="text-sm font-medium text-gray-900">
-                        {link.course.title}
+                        {product?.title}
                       </div>
                       <div className="text-sm text-gray-500">
-                        {link.course.price.toLocaleString('pt-BR', {
+                        {product?.price?.toLocaleString('pt-BR', {
                           style: 'currency',
-                          currency: 'BRL'
+                          currency: 'BRL',
                         })}
                       </div>
                     </div>
@@ -74,27 +91,29 @@ export default function AffiliateLinksTable({
                     <div className="text-sm text-gray-900">
                       {potentialEarnings.toLocaleString('pt-BR', {
                         style: 'currency',
-                        currency: 'BRL'
+                        currency: 'BRL',
                       })}
                     </div>
                     <div className="text-sm text-gray-500">
-                      {link.course.affiliateCommission}% por venda
+                      {product?.affiliateCommission}% por venda
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    {link._count.purchases} vendas
+                    {/* {link._count.purchases} vendas */}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="text-sm font-medium text-green-600">
                       {link.earnings.toLocaleString('pt-BR', {
                         style: 'currency',
-                        currency: 'BRL'
+                        currency: 'BRL',
                       })}
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                     <button
-                      onClick={() => handleCopy(link.affiliateCode, link.courseId)}
+                      onClick={() =>
+                        handleCopy(link.affiliateCode, link.type === 'course' ? link.courseId! : link.plrId!, link.type)
+                      }
                       className={`inline-flex items-center px-3 py-1 rounded-md transition ${
                         copiedId === link.affiliateCode
                           ? 'bg-green-100 text-green-800'
@@ -119,11 +138,11 @@ export default function AffiliateLinksTable({
                     </button>
                   </td>
                 </tr>
-              )
+              );
             })}
           </tbody>
         </table>
       </div>
     </div>
-  )
-} 
+  );
+}

@@ -1,8 +1,8 @@
 import { NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
-import { authOptions } from '../auth/[...nextauth]/route'
-
+import { authOptions } from '@/app/api/auth'
 import { PrismaClient } from '@prisma/client'
+
 const prisma = new PrismaClient()
 
 export async function POST(request: Request) {
@@ -25,9 +25,10 @@ export async function POST(request: Request) {
 
     return NextResponse.json(newModule)
   } catch (error) {
+    console.error('Erro ao criar módulo:', error)
     return NextResponse.json(
       { error: 'Erro ao criar módulo' },
       { status: 500 }
     )
   }
-} 
+}
