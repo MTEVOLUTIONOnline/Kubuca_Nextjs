@@ -1,6 +1,6 @@
 'use client'
 import { useState } from 'react'
-import { Course, Affiliate } from '@prisma/client'
+import { Course } from '@prisma/client'
 
 
 type AffiliateWithDetails = {
@@ -80,18 +80,18 @@ export default function AffiliateLinksTable({ links }: { links: AffiliateWithDet
                         {product?.title}
                       </div>
                       <div className="text-sm text-gray-500">
-                        {product?.price?.toLocaleString('pt-BR', {
+                        {product?.price?.toLocaleString('pt-PT', {
                           style: 'currency',
-                          currency: 'BRL',
+                          currency: 'MZN',
                         })}
                       </div>
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="text-sm text-gray-900">
-                      {potentialEarnings.toLocaleString('pt-BR', {
+                      {potentialEarnings.toLocaleString('pt-PT', {
                         style: 'currency',
-                        currency: 'BRL',
+                        currency: 'MZN',
                       })}
                     </div>
                     <div className="text-sm text-gray-500">
@@ -103,9 +103,9 @@ export default function AffiliateLinksTable({ links }: { links: AffiliateWithDet
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="text-sm font-medium text-green-600">
-                      {link.earnings.toLocaleString('pt-BR', {
+                      {link.earnings.toLocaleString('pt-PT', {
                         style: 'currency',
-                        currency: 'BRL',
+                        currency: 'MZN',
                       })}
                     </div>
                   </td>

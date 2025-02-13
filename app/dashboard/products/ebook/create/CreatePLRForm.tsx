@@ -36,6 +36,7 @@ export default function CreatePLRForm({ courses }: CreatePLRFormProps) {
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!e.target.files?.length) return
 
+
     setUploading(true)
     const files = Array.from(e.target.files)
 
