@@ -1,4 +1,3 @@
-
 import { authOptions } from '@/app/api/auth'
 import { getServerSession } from 'next-auth'
 import Link from 'next/link'
@@ -15,7 +14,7 @@ export default async function CoursesPage() {
 
   const user = await prisma.user.findUnique({
     where: {
-      email: session.user.email!
+      email: session.user.email
     }
   })
 
@@ -47,4 +46,3 @@ export default async function CoursesPage() {
     </div>
   )
 }
-

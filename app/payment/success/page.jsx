@@ -1,15 +1,11 @@
 import Link from 'next/link'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/app/api/auth/auth.config'
-
 import { prisma } from '@/lib/prisma'
 import { notFound } from 'next/navigation'
 
-export default async function PaymentSuccessPage({
-  searchParams,
-}: {
-  searchParams: { courseId: string }
-}) {
+// Removido o tipo de parâmetros
+export default async function PaymentSuccessPage({ searchParams }) {
   const session = await getServerSession(authOptions)
 
   if (!session?.user) {
@@ -68,4 +64,4 @@ export default async function PaymentSuccessPage({
       </div>
     </div>
   )
-} 
+}

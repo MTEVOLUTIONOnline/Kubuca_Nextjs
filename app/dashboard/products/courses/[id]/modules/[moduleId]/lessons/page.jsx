@@ -5,11 +5,8 @@ import LessonList from '@/app/components/LessonList'
 import { notFound } from 'next/navigation'
 import { authOptions } from '@/app/api/auth'
 
-export default async function ModuleLessonsPage({
-  params,
-}: {
-  params: { id: string; moduleId: string }
-}) {
+// Removido o tipo de parâmetros
+export default async function ModuleLessonsPage({ params }) {
   const session = await getServerSession(authOptions)
 
   if (!session?.user) {
@@ -18,7 +15,7 @@ export default async function ModuleLessonsPage({
 
   const user = await prisma.user.findUnique({
     where: {
-      email: session.user.email!
+      email: session.user.email
     }
   })
 
@@ -59,7 +56,6 @@ export default async function ModuleLessonsPage({
           className="text-blue-500 hover:underline mb-4 inline-block"
         >
           ← Voltar para módulos
-
         </Link>
         <div className="flex justify-between items-center">
           <div>
@@ -81,4 +77,4 @@ export default async function ModuleLessonsPage({
       />
     </div>
   )
-} 
+}

@@ -8,12 +8,7 @@ import {
   ShoppingBag,
   GraduationCap,
   LogOut,
-  Book,
-  ShoppingCart,
-  ChevronDown,
-  ChevronRight
 } from 'lucide-react'
-import { useState } from 'react'
 
 const menuItems = [
   {
@@ -68,9 +63,6 @@ const menuItems = [
 export default function DashboardSidebar() {
   const pathname = usePathname()
   const { data: session } = useSession()
-  const [isProductsOpen, setIsProductsOpen] = useState(true)
-
-  const isActive = (path: string) => pathname === path
 
   return (
     <div className="h-full flex flex-col">

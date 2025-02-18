@@ -1,7 +1,7 @@
 import { getServerSession } from 'next-auth'
 import { prisma } from '@/lib/prisma'
 import { redirect } from 'next/navigation'
-import DashboardStats from '@/app/components/dashboard/DashboardStats'
+// import DashboardStats from '@/app/components/dashboard/DashboardStats'
 import ProductList from '@/app/components/dashboard/ProductList'
 import Link from 'next/link'
 import { authOptions } from '@/app/api/auth'
@@ -69,7 +69,7 @@ export default async function DashboardPage() {
     <div className="p-6">
       <h1 className="text-3xl font-bold mb-8">Dashboard</h1>
       
-      <DashboardStats stats={stats} />
+      {/* <DashboardStats stats={stats} /> */}
       
       <div className="mt-8 p-4 bg-white rounded-lg shadow-sm border border-gray-200">
         <div className="flex items-center justify-between">

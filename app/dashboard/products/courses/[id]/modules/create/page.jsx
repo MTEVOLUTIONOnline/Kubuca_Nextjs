@@ -1,16 +1,12 @@
 import { getServerSession } from 'next-auth'
+import { authOptions } from '@/app/api/auth'
 import { prisma } from '@/lib/prisma'
 import { notFound } from 'next/navigation'
-import EditModuleForm from '@/app/components/EditModuleForm'
+import ModuleForm from '@/app/components/ModuleForm'
 import Link from 'next/link'
-import { authOptions } from '@/app/api/auth'
 
-
-export default async function EditModulePage({
-  params,
-}: {
-  params: { id: string; moduleId: string }
-}) {
+// Removido o tipo de parâmetros
+export default async function CreateModulePage({ params }) {
   const session = await getServerSession(authOptions)
 
   if (!session?.user) {
@@ -19,7 +15,7 @@ export default async function EditModulePage({
 
   const user = await prisma.user.findUnique({
     where: {
-      email: session.user.email!
+      email: session.user.email
     }
   })
 
@@ -27,17 +23,14 @@ export default async function EditModulePage({
     return <div>Usuário não encontrado</div>
   }
 
-  const module = await prisma.module.findFirst({
+  const course = await prisma.course.findUnique({
     where: {
-      id: params.moduleId,
-      course: {
-        id: params.id,
-        instructorId: user.id,
-      },
+      id: params.id,
+      instructorId: user.id,
     },
   })
 
-  if (!module) {
+  if (!course) {
     notFound()
   }
 
@@ -51,8 +44,8 @@ export default async function EditModulePage({
           ← Voltar para módulos
         </Link>
       </div>
-      <h1 className="text-2xl font-bold mb-6">Editar Módulo</h1>
-      <EditModuleForm module={module} courseId={params.id} />
+      <h1 className="text-2xl font-bold mb-6">Adicionar Módulo ao Curso: {course.title}</h1>
+      <ModuleForm courseId={course.id} />
     </div>
   )
-} 
+}

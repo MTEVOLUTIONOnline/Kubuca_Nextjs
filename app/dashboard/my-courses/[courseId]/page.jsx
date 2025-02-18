@@ -1,36 +1,33 @@
+import { redirect } from 'next/navigation'
 import { getServerSession } from 'next-auth'
 import { prisma } from '@/lib/prisma'
-import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import CourseContent from '@/app/components/my-courses/CourseContent'
 import { authOptions } from '@/app/api/auth'
 
-export default async function CourseView({
-  params
-}: {
-  params: { courseId: string }
-}) {
+// Removido o tipo PageProps
+export default async function CourseDetailsPage({ params }) {
   const session = await getServerSession(authOptions)
-
+  
   if (!session?.user) {
-    return <div>Acesso negado</div>
+    redirect('/login')
   }
 
   const user = await prisma.user.findUnique({
     where: {
-      email: session.user.email!
+      email: session.user.email
     }
   })
 
   if (!user) {
-    notFound()
+    redirect('/login')
   }
 
-  // Verificar se o usuário comprou o curso
+  // Verificar se o usuário tem acesso ao curso
   const purchase = await prisma.purchase.findFirst({
     where: {
-      userId: user.id,
       courseId: params.courseId,
+      userId: user.id,
       status: 'completed'
     },
     include: {
@@ -60,7 +57,7 @@ export default async function CourseView({
   })
 
   if (!purchase) {
-    notFound()
+    redirect('/dashboard/my-courses')
   }
 
   const { course } = purchase
@@ -84,4 +81,12 @@ export default async function CourseView({
       <CourseContent course={course} />
     </div>
   )
-} 
+}
+
+// Removido o tipo PageProps
+export async function generateMetadata({ params }) {
+  const { courseId } = params
+  return {
+    title: `Curso - ${courseId}`
+  }
+}

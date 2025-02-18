@@ -49,7 +49,7 @@ export async function POST(request: Request) {
     }
 
     // Calcular ganhos
-    let affiliateId = null
+    let affiliateId = ""
     let affiliateUserId = null
     let creatorEarnings = course.price
     let affiliateEarnings = null
@@ -113,7 +113,7 @@ export async function POST(request: Request) {
 
         // 4. Atualizar ganhos do link de afiliado
         await tx.affiliate.update({
-          where: { id: affiliateId },
+          where: {id: affiliateId},
           data: {
             earnings: {
               increment: affiliateEarnings

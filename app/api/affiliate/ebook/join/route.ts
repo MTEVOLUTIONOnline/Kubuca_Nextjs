@@ -2,7 +2,6 @@ import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/app/api/auth'
-
 export async function POST(req: Request) {
   const session = await getServerSession(authOptions)
 
@@ -16,12 +15,16 @@ export async function POST(req: Request) {
     }
   })
 
+  if (!user?.id) {
+    return NextResponse.json({ error: 'Usuário não encontrado' }, { status: 404 })
+  }
+
   const { ebookId } = await req.json()
 
   try {
     const existingAffiliate = await prisma.pLRAffiliate.findFirst({
       where: {
-        userId: user?.id,
+        userId: user.id,  // Agora garantimos que user.id não será undefined
         plrId: ebookId
       }
     })
@@ -34,7 +37,7 @@ export async function POST(req: Request) {
 
     await prisma.pLRAffiliate.create({
       data: {
-        userId: user?.id,
+        userId: user.id,  // Garantido que não será undefined
         plrId: ebookId,
         affiliateCode: affiliateCode,
       }
@@ -49,4 +52,4 @@ export async function POST(req: Request) {
 
 function generateAffiliateCode() {
   return Math.random().toString(36).substring(2, 15)
-} 
+}

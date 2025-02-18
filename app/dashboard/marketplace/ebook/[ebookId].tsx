@@ -47,11 +47,19 @@ export default async function EbookPage({ params }: PageProps) {
     redirect('/dashboard/marketplace')
   }
 
-  const existingPurchase = await prisma.plrPurchase.findFirst({
+  const existingPurchase = await prisma.pLRPurchase.findFirst({
     where: {
       userId: user.id,
       plrId: params.ebookId,
       status: 'completed'
+    }
+  })
+
+  // Verificação se o usuário tem um link de afiliado para este eBook
+  const existingAffiliate = await prisma.pLRAffiliate.findFirst({
+    where: {
+      userId: user.id,
+      plrId: params.ebookId
     }
   })
 
@@ -93,10 +101,11 @@ export default async function EbookPage({ params }: PageProps) {
             <EbookActions 
               ebookId={ebook.id}
               hasPurchased={!!existingPurchase}
+              isAffiliated={!!existingAffiliate} // Passando a variável de afiliado para o componente
             />
           </div>
         </div>
       </div>
     </div>
   )
-} 
+}

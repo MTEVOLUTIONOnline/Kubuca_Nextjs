@@ -1,23 +1,7 @@
 'use client'
 import { useState } from 'react'
-import { Course, AffiliateProgram as AffiliateProgramType } from '@prisma/client'
 
-type Props = {
-  course: Course & {
-    affiliateProgram: AffiliateProgramType & {
-      affiliates: Array<{
-        user: {
-          name: string
-          email: string
-        }
-        totalSales: number
-        totalCommission: number
-      }>
-    }
-  }
-}
-
-export default function AffiliateProgram({ course }: Props) {
+export default function AffiliateProgram({ course }) {
   const [commission, setCommission] = useState(course.affiliateProgram?.commission || 30)
   const [isEnabled, setIsEnabled] = useState(!!course.affiliateProgram)
 
@@ -138,4 +122,4 @@ export default function AffiliateProgram({ course }: Props) {
       )}
     </div>
   )
-} 
+}

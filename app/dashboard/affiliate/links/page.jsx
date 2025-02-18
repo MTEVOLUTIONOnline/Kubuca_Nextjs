@@ -1,10 +1,8 @@
-import { getServerSession } from 'next-auth'
-import { prisma } from '@/lib/prisma'
-import { redirect } from 'next/navigation'
-import AffiliateLinksTable from '@/app/components/affiliate/AffiliateLinksTable'
-import { authOptions } from '@/app/api/auth'
-
-
+import { getServerSession } from 'next-auth';
+import { prisma } from '@/lib/prisma';
+import { redirect } from 'next/navigation';
+import AffiliateLinksTable from '@/app/components/affiliate/AffiliateLinksTable';
+import { authOptions } from '@/app/api/auth';
 
 export default async function AffiliateLinksPage() {
   const session = await getServerSession(authOptions);
@@ -15,7 +13,7 @@ export default async function AffiliateLinksPage() {
 
   const user = await prisma.user.findUnique({
     where: {
-      email: session.user.email!,
+      email: session.user.email,
     },
   });
 
@@ -67,11 +65,11 @@ export default async function AffiliateLinksPage() {
   const affiliateLinks = [
     ...courseAffiliates.map((link) => ({
       ...link,
-      type: 'course', // Adicionar um tipo para identificar o link
+      type: 'course', // Garantir que seja do tipo 'course'
     })),
     ...ebookAffiliates.map((link) => ({
       ...link,
-      type: 'ebook', // Adicionar um tipo para identificar o link
+      type: 'ebook', // Garantir que seja do tipo 'ebook'
     })),
   ];
 

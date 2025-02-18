@@ -1,33 +1,24 @@
-import { redirect } from 'next/navigation'
-import { getServerSession } from 'next-auth'
-import { prisma } from '@/lib/prisma'
-import AffiliateCheckout from '@/app/components/checkout/AffiliateCheckout'
-import { authOptions } from '@/app/api/auth'
+import { redirect } from 'next/navigation';
+import { getServerSession } from 'next-auth';
+import { prisma } from '@/lib/prisma';
+import AffiliateCheckout from '@/app/components/checkout/AffiliateCheckout';
+import { authOptions } from '@/app/api/auth';
 
-type Props = {
-  params: {
-    courseId: string
-  }
-  searchParams: {
-    ref?: string // código do afiliado
-  }
-}
-
-export default async function CheckoutPage({ params, searchParams }: Props) {
-  const session = await getServerSession(authOptions)
+export default async function CheckoutPage({ params, searchParams }) {
+  const session = await getServerSession(authOptions);
   
   if (!session?.user) {
-    redirect('/login')
+    redirect('/login');
   }
 
   const user = await prisma.user.findUnique({
     where: {
-      email: session.user.email!
+      email: session.user.email
     }
-  })
+  });
 
   if (!user) {
-    redirect('/login')
+    redirect('/login');
   }
 
   // Buscar curso com dados do instrutor
@@ -46,15 +37,27 @@ export default async function CheckoutPage({ params, searchParams }: Props) {
         }
       }
     }
-  })
+  });
 
-  if (!course) {
-    redirect('/dashboard/marketplace')
+  if (!course || !course.imageUrl || !course.instructor.name) {
+    redirect('/dashboard/marketplace');
   }
+
+  // Preparar dados do curso garantindo que campos não são null
+  const courseData = {
+    id: course.id,
+    title: course.title,
+    description: course.description,
+    price: course.price,
+    imageUrl: course.imageUrl,
+    instructor: {
+      name: course.instructor.name
+    }
+  };
 
   // Não permitir que o instrutor compre seu próprio curso
   if (course.instructor.email === session.user.email) {
-    redirect('/dashboard/courses')
+    redirect('/dashboard/courses');
   }
 
   // Verificar se já comprou
@@ -64,14 +67,14 @@ export default async function CheckoutPage({ params, searchParams }: Props) {
       userId: user.id,
       status: 'completed'
     }
-  })
+  });
 
   if (existingPurchase) {
-    redirect(`/dashboard/my-courses/${params.courseId}`)
+    redirect(`/dashboard/my-courses/${params.courseId}`);
   }
 
   // Verificar código de afiliado
-  let affiliateData = null
+  let affiliateData = null;
   if (searchParams.ref) {
     const affiliate = await prisma.affiliate.findFirst({
       where: {
@@ -85,20 +88,20 @@ export default async function CheckoutPage({ params, searchParams }: Props) {
           }
         }
       }
-    })
+    });
 
-    if (affiliate) {
+    if (affiliate && affiliate.user.name) {
       affiliateData = {
         code: affiliate.affiliateCode,
         name: affiliate.user.name
-      }
+      };
     }
   }
 
   return (
     <AffiliateCheckout 
-      course={course}
+      course={courseData}
       affiliateData={affiliateData}
     />
-  )
-} 
+  );
+}

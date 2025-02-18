@@ -1,15 +1,12 @@
-import { getServerSession } from 'next-auth'
 import { authOptions } from '@/app/api/auth'
-
-import { prisma } from '@/lib/prisma'
+import { getServerSession } from 'next-auth'
 import { notFound } from 'next/navigation'
-import ModuleForm from '@/app/components/ModuleForm'
+import EditCourseForm from '@/app/components/EditCourseForm'
+import { prisma } from '@/lib/prisma'
 import Link from 'next/link'
-export default async function CreateModulePage({
-  params,
-}: {
-  params: { id: string }
-}) {
+
+// Removido o tipo de parâmetros
+export default async function EditCoursePage({ params }) {
   const session = await getServerSession(authOptions)
 
   if (!session?.user) {
@@ -18,7 +15,7 @@ export default async function CreateModulePage({
 
   const user = await prisma.user.findUnique({
     where: {
-      email: session.user.email!
+      email: session.user.email
     }
   })
 
@@ -47,8 +44,8 @@ export default async function CreateModulePage({
           ← Voltar para módulos
         </Link>
       </div>
-      <h1 className="text-2xl font-bold mb-6">Adicionar Módulo ao Curso: {course.title}</h1>
-      <ModuleForm courseId={course.id} />
+      <h1 className="text-2xl font-bold mb-6">Editar Curso</h1>
+      <EditCourseForm course={course} />
     </div>
   )
-} 
+}

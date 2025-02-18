@@ -3,7 +3,7 @@ import { prisma } from '@/lib/prisma'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/app/api/auth'
 
-export async function POST(req: Request) {
+export async function POST(req) {
   const session = await getServerSession(authOptions)
 
   if (!session?.user) {
@@ -13,6 +13,7 @@ export async function POST(req: Request) {
   const { ebookId } = await req.json()
 
   try {
+    // Verifica se o usuário já é afiliado a este eBook
     const existingAffiliate = await prisma.affiliate.findFirst({
       where: {
         userId: session.user.id,
@@ -24,8 +25,10 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'Você já é afiliado deste eBook' }, { status: 400 })
     }
 
-    const affiliateCode = generateAffiliateCode() // Função para gerar um código de afiliado
+    // Gerar um código de afiliado único
+    const affiliateCode = generateAffiliateCode()
 
+    // Criação do registro de afiliação
     await prisma.affiliate.create({
       data: {
         userId: session.user.id,
@@ -41,6 +44,7 @@ export async function POST(req: Request) {
   }
 }
 
+// Função para gerar um código de afiliado único
 function generateAffiliateCode() {
-  return Math.random().toString(36).substring(2, 15) // Exemplo simples de geração de código
-} 
+  return `${Date.now().toString(36)}-${Math.random().toString(36).substring(2, 15)}`
+}

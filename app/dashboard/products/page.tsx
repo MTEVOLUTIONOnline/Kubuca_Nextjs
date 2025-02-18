@@ -1,7 +1,6 @@
 import { authOptions } from '@/app/api/auth'
 import { getServerSession } from 'next-auth'
 import Link from 'next/link'
-import CourseList from '@/app/components/CourseList'
 import { prisma } from '@/lib/prisma'
 import { Plus, Book, BookOpen } from 'lucide-react'
 import Image from 'next/image'

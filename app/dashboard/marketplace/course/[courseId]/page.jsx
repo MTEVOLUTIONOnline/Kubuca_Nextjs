@@ -7,11 +7,7 @@ import CourseActions from './CourseActions'
 import { ArrowLeft } from 'lucide-react'
 import Link from 'next/link'
 
-export default async function CoursePage({ 
-  params 
-}: { 
-  params: { courseId: string } 
-}) {
+export default async function CoursePage({ params }) {
   const session = await getServerSession(authOptions)
 
   if (!session?.user) {
@@ -20,7 +16,7 @@ export default async function CoursePage({
 
   const user = await prisma.user.findUnique({
     where: {
-      email: session.user.email!
+      email: session.user.email
     }
   })
 
@@ -28,14 +24,11 @@ export default async function CoursePage({
     redirect('/login')
   }
 
-  // Buscar o curso e a compra em uma única transação
   const [course, existingPurchase] = await Promise.all([
     prisma.course.findUnique({
       where: {
         id: params.courseId,
-        affiliateCommission: {
-          gt: 0 // Apenas cursos com programa de afiliados
-        }
+        affiliateCommission: { gt: 0 }
       },
       include: {
         instructor: {
@@ -71,12 +64,8 @@ export default async function CoursePage({
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Botão Voltar */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-        <Link 
-          href="/dashboard/marketplace" 
-          className="inline-flex items-center text-gray-600 hover:text-gray-900"
-        >
+        <Link href="/dashboard/marketplace" className="inline-flex items-center text-gray-600 hover:text-gray-900">
           <ArrowLeft className="w-5 h-5 mr-2" />
           Voltar para o Marketplace
         </Link>
@@ -84,10 +73,9 @@ export default async function CoursePage({
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-12">
         <div className="bg-white rounded-lg shadow-lg overflow-hidden">
-          {/* Cabeçalho do Curso */}
           <div className="relative h-96">
             <Image
-              src={process.env.NEXT_PUBLIC_BACKEND_URL+"/"+course.imageUrl}
+              src={process.env.NEXT_PUBLIC_BACKEND_URL + "/" + course.imageUrl}
               alt={course.title}
               fill
               className="object-cover"
@@ -101,9 +89,7 @@ export default async function CoursePage({
           </div>
 
           <div className="p-8">
-            {/* Grid de 2 colunas */}
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-              {/* Coluna da Esquerda - Detalhes do Curso */}
               <div className="lg:col-span-2">
                 <div className="prose max-w-none">
                   <h2 className="text-2xl font-bold mb-4">Sobre o Curso</h2>
@@ -125,7 +111,6 @@ export default async function CoursePage({
                 </div>
               </div>
 
-              {/* Coluna da Direita - Preço e Ações */}
               <div className="lg:col-span-1">
                 <div className="bg-gray-50 rounded-lg p-6 sticky top-6">
                   <div className="mb-6">
@@ -165,4 +150,4 @@ export default async function CoursePage({
       </div>
     </div>
   )
-} 
+}

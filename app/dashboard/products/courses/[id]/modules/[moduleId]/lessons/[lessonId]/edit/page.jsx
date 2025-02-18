@@ -1,15 +1,11 @@
-
 import { authOptions } from '@/app/api/auth'
 import { getServerSession } from 'next-auth'
 import { prisma } from '@/lib/prisma'
 import { notFound } from 'next/navigation'
 import EditLessonForm from '@/app/components/EditLessonForm'
 
-export default async function EditLessonPage({
-  params,
-}: {
-  params: { id: string; moduleId: string; lessonId: string }
-}) {
+// Removido o tipo de parâmetros
+export default async function EditLessonPage({ params }) {
   const session = await getServerSession(authOptions)
 
   if (!session?.user) {
@@ -18,7 +14,7 @@ export default async function EditLessonPage({
 
   const user = await prisma.user.findUnique({
     where: {
-      email: session.user.email!
+      email: session.user.email
     }
   })
 
@@ -69,4 +65,4 @@ export default async function EditLessonPage({
       />
     </div>
   )
-} 
+}

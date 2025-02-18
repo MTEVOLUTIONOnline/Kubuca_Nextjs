@@ -4,11 +4,8 @@ import { notFound } from 'next/navigation'
 import AffiliateProgram from '@/app/components/affiliate/AffiliateProgram'
 import { authOptions } from '@/app/api/auth'
 
-export default async function CourseAffiliatePage({
-  params,
-}: {
-  params: { id: string }
-}) {
+// Removido o tipo de parâmetros
+export default async function CourseAffiliatePage({ params }) {
   const session = await getServerSession(authOptions)
 
   if (!session?.user) {
@@ -43,4 +40,4 @@ export default async function CourseAffiliatePage({
       <AffiliateProgram course={course} />
     </div>
   )
-} 
+}

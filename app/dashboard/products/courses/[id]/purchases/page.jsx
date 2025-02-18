@@ -5,11 +5,8 @@ import Link from 'next/link'
 import PurchaseHistory from '@/app/components/dashboard/PurchaseHistory'
 import { authOptions } from '@/app/api/auth'
 
-export default async function CoursePurchasesPage({
-  params,
-}: {
-  params: { courseId: string }
-}) {
+// Removido o tipo de parâmetros
+export default async function CoursePurchasesPage({ params }) {
   const session = await getServerSession(authOptions)
 
   if (!session?.user) {
@@ -18,7 +15,7 @@ export default async function CoursePurchasesPage({
 
   const user = await prisma.user.findUnique({
     where: {
-      email: session.user.email!
+      email: session.user.email
     }
   })
 
@@ -67,4 +64,4 @@ export default async function CoursePurchasesPage({
       <PurchaseHistory purchases={course.purchases} />
     </div>
   )
-} 
+}

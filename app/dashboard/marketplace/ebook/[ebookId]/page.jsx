@@ -9,8 +9,6 @@ import Link from 'next/link'
 
 export default async function EbookPage({ 
   params 
-}: { 
-  params: { ebookId: string } 
 }) {
   const session = await getServerSession(authOptions)
 
@@ -20,7 +18,7 @@ export default async function EbookPage({
 
   const user = await prisma.user.findUnique({
     where: {
-      email: session.user.email!
+      email: session.user.email
     }
   })
 
@@ -32,7 +30,7 @@ export default async function EbookPage({
     where: {
       id: params.ebookId,
       affiliateCommission: {
-        gt: 0 // Apenas eBooks com programa de afiliados
+        gt: 0 
       }
     },
     include: {
@@ -63,7 +61,6 @@ export default async function EbookPage({
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Botão Voltar */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
         <Link 
           href="/dashboard/marketplace" 
@@ -76,7 +73,6 @@ export default async function EbookPage({
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-12">
         <div className="bg-white rounded-lg shadow-lg overflow-hidden">
-          {/* Cabeçalho do eBook */}
           <div className="relative h-96">
             <Image
               src={process.env.NEXT_PUBLIC_BACKEND_URL+"/"+ebook.thumbnailUrl}
@@ -140,4 +136,4 @@ export default async function EbookPage({
       </div>
     </div>
   )
-} 
+}

@@ -5,11 +5,8 @@ import Link from 'next/link'
 import ModuleList from '@/app/components/ModuleList'
 import { notFound } from 'next/navigation'
 
-export default async function CourseModulesPage({
-  params,
-}: {
-  params: { id: string }
-}) {
+// Removido o tipo de parâmetros
+export default async function CourseModulesPage({ params }) {
   const session = await getServerSession(authOptions)
 
   if (!session?.user) {
@@ -18,7 +15,7 @@ export default async function CourseModulesPage({
 
   const user = await prisma.user.findUnique({
     where: {
-      email: session.user.email!
+      email: session.user.email
     }
   })
 
@@ -55,7 +52,6 @@ export default async function CourseModulesPage({
         </Link>
       </div>
       <div className="flex justify-between items-center mb-6">
-
         <div>
           <h1 className="text-2xl font-bold">Módulos do Curso: {course.title}</h1>
           <p className="text-gray-600 mt-1">{course.description}</p>
@@ -70,6 +66,4 @@ export default async function CourseModulesPage({
       <ModuleList modules={course.modules} courseId={course.id} />
     </div>
   )
-} 
-
-// http://localhost:3000/dashboard/products/courses/cm6x9z5j60001ukwkqea1zpmo/modules
+}

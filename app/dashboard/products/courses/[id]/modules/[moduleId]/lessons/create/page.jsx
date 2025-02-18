@@ -1,15 +1,11 @@
-
 import { getServerSession } from 'next-auth'
 import { prisma } from '@/lib/prisma'
 import { notFound } from 'next/navigation'
 import LessonForm from '@/app/components/LessonForm'
 import { authOptions } from '@/app/api/auth'
 
-export default async function CreateLessonPage({
-  params,
-}: {
-  params: { id: string; moduleId: string }
-}) {
+// Removido o tipo de parâmetros
+export default async function CreateLessonPage({ params }) {
   const session = await getServerSession(authOptions)
 
   if (!session?.user) {
@@ -18,7 +14,7 @@ export default async function CreateLessonPage({
 
   const user = await prisma.user.findUnique({
     where: {
-      email: session.user.email!
+      email: session.user.email
     }
   })
 
@@ -58,4 +54,4 @@ export default async function CreateLessonPage({
       />
     </div>
   )
-} 
+}

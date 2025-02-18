@@ -40,6 +40,15 @@ PROBLEMAS NAO CONCLUIDOS:
 - [DELETAR CURSO]
 - [EDITAR CURSO]
 - [PESQUISAR CURSO NA ROTA http://localhost:3000/marketplace]
+- {
+   roteamento: [
+    -dasboar cursos
+    -dasboar ebooks
+    -dasboar afiliados
+    -dasboar vendas
+    -dasboar estatisticas
+   ] 
+   }
 
 
  

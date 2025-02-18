@@ -9,7 +9,7 @@ type AffiliateWithDetails = {
   userId: string;
   courseId?: string; // Opcional, pois pode ser um link de ebook
   plrId?: string; // Opcional, pois pode ser um link de curso
-  type: 'course' | 'ebook'; // Tipo para identificar se é curso ou ebook
+  type: "course" | "ebook"; // Tipo para identificar se é curso ou ebook
   course?: Course; // Dados do curso (se for um link de curso)
   plr?: {
     id: string;
@@ -146,3 +146,16 @@ export default function AffiliateLinksTable({ links }: { links: AffiliateWithDet
     </div>
   );
 }
+
+
+// Corrigir a combinação dos links
+// const affiliateLinks = [
+//   ...courseAffiliates.map((link) => ({
+//     ...link,
+//     type: 'course' as 'course', // Garantir que seja do tipo 'course'
+//   })),
+//   ...ebookAffiliates.map((link) => ({
+//     ...link,
+//     type: 'ebook' as 'ebook', // Garantir que seja do tipo 'ebook'
+//   })),
+// ];
