@@ -6,7 +6,7 @@ import ProductList from '@/app/components/dashboard/ProductList'
 import Link from 'next/link'
 import { authOptions } from '@/app/api/auth'
 
-export default async function DashboardPage() {
+export default async function Dashboard() {
   const session = await getServerSession(authOptions)
 
   if (!session?.user) {
@@ -90,6 +90,15 @@ export default async function DashboardPage() {
         <h2 className="text-2xl font-bold mb-6">Meus Produtos</h2>
         <ProductList courses={coursesWithSales} />
       </div>
+      
+      {session?.user.role === 'ADMIN' && (
+        <Link 
+          href="/admin"
+          className="bg-purple-600 text-white px-4 py-2 rounded-md hover:bg-purple-700"
+        >
+          Acessar Painel Admin
+        </Link>
+      )}
     </div>
   )
 } 

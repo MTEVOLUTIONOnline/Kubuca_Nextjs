@@ -13,63 +13,77 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum Role {
+  USER
+  ADMIN
+  INSTRUCTOR
+}
+
 model User {
-  id            String    @id @default(cuid())
-  name          String?
-  email         String    @unique
-  password      String
-  courses       Course[]
-  purchases     Purchase[]
-  lessonProgress LessonProgress[]
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
-  affiliateLinks     Affiliate[]  // Links de afiliado que o usuário possui
-  affiliateEarnings  Float        @default(0) // Ganhos totais como afiliado
-  balance           Float    @default(0) // Adicionado campo de saldo
-  plrPurchases      PLRPurchase[] // Adicionando relação inversa
-  plr      PLR[] // Adicionando relação inversa
-  plrAffiliates    PLRAffiliate[]  // Adicionar esta linha
+  id        String   @id @default(cuid())
+  name      String?
+  email     String   @unique
+  password  String
+  image     String?
+  role      Role     @default(ADMIN)
+  active    Boolean  @default(true)
+  lastLogin DateTime?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  activities Activity[]
+  payments    Payment[]
+
+  // Relações
+  courses           Course[]
+  purchases         Purchase[]
+  affiliates        Affiliate[] // Links de afiliado que o usuário possui
+  plrPurchases      PLRPurchase[]
+  plr               PLR[]
+  plrAffiliates     PLRAffiliate[]
+  lessonProgress    LessonProgress[]
+  affiliateEarnings Float            @default(0) // Ganhos totais como afiliado
+  balance           Float            @default(0) // Saldo do usuário
 }
 
 // PLR
 
 model Course {
-  id           String    @id @default(cuid())
-  title        String
-  description  String
-  imageUrl     String?
-  price        Float     @default(0)
-  instructor   User      @relation(fields: [instructorId], references: [id])
-  instructorId String
-  modules      Module[]
-  purchases    Purchase[]
-  createdAt    DateTime  @default(now())
-  updatedAt    DateTime  @updatedAt
-  affiliateCommission Float     @default(0) // Porcentagem de comissão para afiliados
-  affiliates         Affiliate[]
+  id                  String      @id @default(cuid())
+  title               String
+  description         String
+  imageUrl            String?
+  price               Float       @default(0)
+  instructor          User        @relation(fields: [instructorId], references: [id])
+  instructorId        String
+  modules             Module[]
+  purchases           Purchase[]
+  createdAt           DateTime    @default(now())
+  updatedAt           DateTime    @updatedAt
+  affiliateCommission Float       @default(0) // Porcentagem de comissão para afiliados
+  affiliates          Affiliate[]
 }
 
 model Module {
-  id          String    @id @default(cuid())
+  id          String   @id @default(cuid())
   title       String
   description String
-  course      Course    @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  course      Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
   courseId    String
   lessons     Lesson[]
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 }
 
 model Lesson {
-  id          String    @id @default(cuid())
+  id          String           @id @default(cuid())
   title       String
   description String
   videoUrl    String?
-  module      Module    @relation(fields: [moduleId], references: [id], onDelete: Cascade)
+  module      Module           @relation(fields: [moduleId], references: [id], onDelete: Cascade)
   moduleId    String
   progress    LessonProgress[]
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
   duration    Int?
 }
 
@@ -82,14 +96,14 @@ model Purchase {
   createdAt DateTime @default(now())
 
   // Relacionamentos
-  user      User      @relation(fields: [userId], references: [id])
-  course    Course    @relation(fields: [courseId], references: [id])
-  affiliate Affiliate? @relation(fields: [affiliateId], references: [id])
+  user        User       @relation(fields: [userId], references: [id])
+  course      Course     @relation(fields: [courseId], references: [id])
+  affiliate   Affiliate? @relation(fields: [affiliateId], references: [id])
   affiliateId String?
 
   // Ganhos
-  creatorEarnings  Float  @default(0)
-  affiliateEarnings Float? 
+  creatorEarnings   Float  @default(0)
+  affiliateEarnings Float?
 
   @@map("purchases")
 }
@@ -107,68 +121,108 @@ model LessonProgress {
   @@unique([userId, lessonId])
 }
 
-// Novos modelos para afiliação
+// Modelo para links de afiliados (substituindo o antigo Affiliate)
 model Affiliate {
-  id            String    @id @default(cuid())
-  userId        String    // Usuário que é afiliado
-  courseId      String    // Curso que está afiliado
-  affiliateCode String    @unique // Código único de afiliado
-  user          User      @relation(fields: [userId], references: [id])
-  course        Course    @relation(fields: [courseId], references: [id])
+  id            String     @id @default(cuid())
+  userId        String // Usuário que é afiliado
+  courseId      String // Curso que está afiliado
+  affiliateCode String     @unique // Código único de afiliado
+  user          User       @relation(fields: [userId], references: [id])
+  course        Course     @relation(fields: [courseId], references: [id])
   purchases     Purchase[] // Vendas realizadas por este afiliado
-  earnings      Float     @default(0) // Ganhos deste link específico
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
+  earnings      Float      @default(0) // Ganhos deste link específico
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
 
   @@unique([userId, courseId])
 }
 
 enum PLRType {
-  EBOOK     // Alterado para EBOOK
+  EBOOK // Alterado para EBOOK
 }
 
 model PLR {
-  id                String   @id @default(cuid())
-  userId            String   
-  user              User     @relation(fields: [userId], references: [id])
-  type              PLRType  @default(EBOOK)
-  price             Float    
-  terms             String   
-  ebookUrls         String   
-  title             String   
-  description       String   
-  thumbnailUrl      String?  
-  active            Boolean  @default(true)
-  createdAt         DateTime @default(now())
-  updatedAt         DateTime @updatedAt
-  purchases         PLRPurchase[]
-  affiliateCommission Float    @default(0)
-  affiliates        PLRAffiliate[]
+  id                  String         @id @default(cuid())
+  userId              String
+  user                User           @relation(fields: [userId], references: [id])
+  type                PLRType        @default(EBOOK)
+  price               Float
+  terms               String
+  ebookUrls           String
+  title               String
+  description         String
+  thumbnailUrl        String?
+  active              Boolean        @default(true)
+  createdAt           DateTime       @default(now())
+  updatedAt           DateTime       @updatedAt
+  purchases           PLRPurchase[]
+  affiliateCommission Float          @default(0)
+  affiliates          PLRAffiliate[]
 }
 
 model PLRPurchase {
-  id          String   @id @default(cuid())
-  plrId       String
-  plr         PLR      @relation(fields: [plrId], references: [id])
-  userId      String
-  user        User     @relation(fields: [userId], references: [id])
-  status      String   // pending, completed, cancelled
-  price       Float
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id        String   @id @default(cuid())
+  plrId     String
+  plr       PLR      @relation(fields: [plrId], references: [id])
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  status    String // pending, completed, cancelled
+  price     Float
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 // Novo modelo para afiliados de PLR
 model PLRAffiliate {
-  id            String    @id @default(cuid())
+  id            String   @id @default(cuid())
   userId        String
   plrId         String
-  affiliateCode String    @unique
-  user          User      @relation(fields: [userId], references: [id])
-  plr           PLR       @relation(fields: [plrId], references: [id])
-  earnings      Float     @default(0)
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
+  affiliateCode String   @unique
+  user          User     @relation(fields: [userId], references: [id])
+  plr           PLR      @relation(fields: [plrId], references: [id])
+  earnings      Float    @default(0)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
 
   @@unique([userId, plrId])
+}
+
+model Activity {
+  id          String   @id @default(cuid())
+  description String
+  createdAt   DateTime @default(now())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id])
+}
+
+enum PaymentStatus {
+  PENDING
+  PROCESSING
+  COMPLETED
+  REJECTED
+}
+
+model Payment {
+  id          String        @id @default(cuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id])
+
+  amount      Float
+  mpesaName   String        // Nome registrado no MPesa
+  mpesaNumber String        // Número do MPesa
+  status      PaymentStatus @default(PENDING)
+  notes       String?       // Notas administrativas
+  processedAt DateTime?     // Data em que o pagamento foi processado
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+  finalAmount    Float          // Valor após a taxa
+  feeAmount      Float          // Valor da taxa
+  feePercentage  Float          // Percentual da taxa aplicada
+}
+
+// Adicionar este modelo
+model Settings {
+  id                String   @id @default(cuid())
+  withdrawalFee     Float    @default(10) // Taxa padrão de 10%
+  updatedAt         DateTime @updatedAt
 }
