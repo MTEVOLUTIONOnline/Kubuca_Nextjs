@@ -77,3 +77,70 @@ export async function PATCH(request) {
     )
   }
 } 
+
+export async function PUT(request, { params }) {
+  try {
+    const session = await getServerSession(authOptions)
+    
+    if (!session?.user?.role || session.user.role !== 'ADMIN') {
+      return NextResponse.json(
+        { error: 'Não autorizado' },
+        { status: 401 }
+      )
+    }
+
+    const { status } = await request.json()
+    const { paymentId } = params
+
+    // Buscar o pagamento
+    const payment = await prisma.payment.findUnique({
+      where: { id: paymentId },
+      include: { user: true }
+    })
+
+    if (!payment) {
+      return NextResponse.json(
+        { error: 'Pagamento não encontrado' },
+        { status: 404 }
+      )
+    }
+
+    // Se estiver aprovando o pagamento
+    if (status === 'COMPLETED') {
+      // Verificar saldo novamente por segurança
+      if (payment.user.balance < payment.amount) {
+        return NextResponse.json(
+          { error: 'Saldo insuficiente para aprovar o saque' },
+          { status: 400 }
+        )
+      }
+
+      // Atualizar o saldo do usuário apenas na aprovação
+      await prisma.user.update({
+        where: { id: payment.userId },
+        data: {
+          balance: {
+            decrement: payment.amount
+          }
+        }
+      })
+    }
+
+    // Atualizar status do pagamento
+    const updatedPayment = await prisma.payment.update({
+      where: { id: paymentId },
+      data: { 
+        status,
+        processedAt: status === 'COMPLETED' ? new Date() : null
+      }
+    })
+
+    return NextResponse.json(updatedPayment)
+  } catch (error) {
+    console.error('Erro ao atualizar pagamento:', error)
+    return NextResponse.json(
+      { error: 'Erro ao atualizar pagamento' },
+      { status: 500 }
+    )
+  }
+} 

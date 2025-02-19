@@ -7,7 +7,7 @@ export async function GET(request) {
   try {
     const session = await getServerSession(authOptions)
 
-    if (!session?.user) {
+    if (!session?.user?.id) {
       return NextResponse.json(
         { error: 'Não autorizado' },
         { status: 401 }
@@ -47,10 +47,10 @@ export async function GET(request) {
     })
 
   } catch (error) {
-    console.error('Erro ao buscar pagamentos:', error)
+    console.error('Erro ao buscar pagamentos:', error || 'Erro desconhecido')
     return NextResponse.json(
       { error: 'Erro ao buscar pagamentos' },
       { status: 500 }
     )
   }
-} 
+}

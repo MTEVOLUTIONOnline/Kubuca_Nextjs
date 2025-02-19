@@ -6,53 +6,43 @@ import { authOptions } from '@/app/api/auth/[...nextauth]/route'
 export async function GET(request) {
   try {
     const session = await getServerSession(authOptions)
-
-    if (!session?.user || session.user.role !== 'ADMIN') {
+    
+    if (!session?.user?.role || session.user.role !== 'ADMIN') {
       return NextResponse.json(
         { error: 'Não autorizado' },
-        { status: 403 }
+        { status: 401 }
       )
     }
 
     // Pegar parâmetros da URL
     const { searchParams } = new URL(request.url)
     const page = parseInt(searchParams.get('page') || '1')
-    const limit = parseInt(searchParams.get('limit') || '8')
+    const limit = parseInt(searchParams.get('limit') || '10')
     const status = searchParams.get('status')
-    const search = searchParams.get('search')
-    const dateFrom = searchParams.get('dateFrom')
-    const dateTo = searchParams.get('dateTo')
+    const search = searchParams.get('search') || ''
+    const skip = (page - 1) * limit
 
     // Construir where clause
-    const where = {}
-
-    if (status) {
-      where.status = status
-    }
-
-    if (search) {
-      where.OR = [
-        { mpesaName: { contains: search } },
-        { mpesaNumber: { contains: search } },
-        { user: { name: { contains: search } } },
-        { user: { email: { contains: search } } }
+    const where = {
+      AND: [
+        // Filtro de status
+        status && status !== 'all' ? { status } : {},
+        // Filtro de busca
+        search ? {
+          OR: [
+            { user: { name: { contains: search } } },
+            { user: { email: { contains: search } } },
+            { mpesaNumber: { contains: search } },
+            { mpesaName: { contains: search } }
+          ]
+        } : {}
       ]
-    }
-
-    if (dateFrom || dateTo) {
-      where.createdAt = {}
-      if (dateFrom) {
-        where.createdAt.gte = new Date(dateFrom)
-      }
-      if (dateTo) {
-        where.createdAt.lte = new Date(dateTo + 'T23:59:59')
-      }
     }
 
     // Buscar total de registros
     const total = await prisma.payment.count({ where })
 
-    // Buscar pagamentos com paginação e filtros
+    // Buscar pagamentos
     const payments = await prisma.payment.findMany({
       where,
       include: {
@@ -66,7 +56,7 @@ export async function GET(request) {
       orderBy: {
         createdAt: 'desc'
       },
-      skip: (page - 1) * limit,
+      skip,
       take: limit
     })
 

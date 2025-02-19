@@ -6,24 +6,54 @@ import { FiDollarSign, FiChevronLeft, FiChevronRight } from 'react-icons/fi'
 export default function Payments() {
   const [loading, setLoading] = useState(false)
   const [balaceError, setBalaceError] = useState('')
+  const [amount, setAmount] = useState('')
+  const [withdrawalFee, setWithdrawalFee] = useState(10) // Taxa padrão de 10%
+  const [finalAmount, setFinalAmount] = useState(0)
+  const [feeAmount, setFeeAmount] = useState(0)
 
   const [formData, setFormData] = useState({
-    amount: '',
     mpesaName: '',
     mpesaNumber: ''
   })
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setLoading(true);
-  
-    const amount = parseFloat(formData.amount);
-    if (isNaN(amount) || amount <= 0) {
-      alert('Por favor, insira um valor válido para o saque.');
-      setLoading(false);
-      return;
+  // Buscar a taxa de saque das configurações
+  useEffect(() => {
+    const fetchSettings = async () => {
+      try {
+        const response = await fetch('/api/admin/settings')
+        const data = await response.json()
+        if (data.withdrawalFee) {
+          setWithdrawalFee(data.withdrawalFee)
+        }
+      } catch (error) {
+        console.error('Erro ao buscar configurações:', error)
+      }
     }
-  
+    fetchSettings()
+  }, [])
+
+  // Calcular valores quando o amount ou withdrawalFee mudar
+  useEffect(() => {
+    const value = parseFloat(amount) || 0
+    const fee = (value * withdrawalFee) / 100
+    const final = value - fee
+
+    setFeeAmount(fee)
+    setFinalAmount(final)
+  }, [amount, withdrawalFee])
+
+  const handleSubmit = async (e) => {
+    e.preventDefault()
+    setLoading(true)
+    setBalaceError('')
+
+    const value = parseFloat(amount)
+    if (isNaN(value) || value <= 0) {
+      setBalaceError('Por favor, insira um valor válido para o saque.')
+      setLoading(false)
+      return
+    }
+
     try {
       const response = await fetch('/api/payments/withdraw', {
         method: 'POST',
@@ -31,31 +61,38 @@ export default function Payments() {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          ...formData,
-          amount: amount,
+          amount: value,
+          mpesaName: formData.mpesaName,
+          mpesaNumber: formData.mpesaNumber,
+          feeAmount,
+          finalAmount,
+          feePercentage: withdrawalFee
         }),
-      });
-  
-      const data = await response.json();
-  
+      })
+
+      const data = await response.json()
+
       if (!response.ok) {
-        throw new Error(data.error || 'Erro ao solicitar saque');
+        throw new Error(data.error || 'Erro ao solicitar saque')
       }
-  
+
+      // Limpar formulário após sucesso
+      setAmount('')
       setFormData({
-        amount: '',
         mpesaName: '',
         mpesaNumber: '',
-      });
-  
-      alert('Solicitação de saque enviada com sucesso!');
+      })
+      setFinalAmount(0)
+      setFeeAmount(0)
+
+      alert('Solicitação de saque enviada com sucesso!')
     } catch (error) {
-      console.error('Erro:', error);
-      setBalaceError(error.message || 'Erro ao solicitar saque');
+      console.error('Erro:', error)
+      setBalaceError(error.message)
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
-  };
+  }
 
   return (
     <div className="p-6">
@@ -75,8 +112,8 @@ export default function Payments() {
                   type="number"
                   required
                   min="1"
-                  value={formData.amount}
-                  onChange={(e) => setFormData({ ...formData, amount: e.target.value })}
+                  value={amount}
+                  onChange={(e) => setAmount(e.target.value)}
                   className="pl-10 w-full rounded-lg border border-gray-300 p-2"
                   placeholder="0.00"
                 />
@@ -111,7 +148,24 @@ export default function Payments() {
               />
             </div>
           </div>
-          {balaceError && <p className="text-red-500 mb-2 mt-6">{balaceError}</p>}
+
+          {amount && (
+            <div className="mt-4 p-4 bg-gray-50 rounded-md">
+              <p className="text-sm text-gray-600">
+                Taxa de saque: {withdrawalFee}%
+              </p>
+              <p className="text-sm text-gray-600">
+                Valor da taxa: MT {feeAmount.toFixed(2)}
+              </p>
+              <p className="font-medium">
+                Valor final: MT {finalAmount.toFixed(2)}
+              </p>
+            </div>
+          )}
+
+          {balaceError && (
+            <p className="text-red-500 mt-4">{balaceError}</p>
+          )}
 
           <button
             type="submit"
@@ -168,7 +222,9 @@ export function LISTpayments() {
           <thead className="bg-gray-50">
             <tr>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Data</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Valor</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Valor Solicitado</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Taxa</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Valor Final</th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">M-Pesa</th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
             </tr>
@@ -184,6 +240,15 @@ export function LISTpayments() {
                     {payment.amount.toLocaleString('pt-BR', { style: 'currency', currency: 'MZN' })}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    {payment.feeAmount.toLocaleString('pt-BR', { style: 'currency', currency: 'MZN' })}
+                    <span className="text-xs text-gray-400 ml-1">
+                      ({payment.feePercentage}%)
+                    </span>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                    {payment.finalAmount.toLocaleString('pt-BR', { style: 'currency', currency: 'MZN' })}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                     {payment.mpesaNumber}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
@@ -192,14 +257,17 @@ export function LISTpayments() {
                         payment.status === 'PENDING' ? 'bg-yellow-100 text-yellow-800' :
                         payment.status === 'REJECTED' ? 'bg-red-100 text-red-800' :
                         'bg-blue-100 text-blue-800'}`}>
-                      {payment.status}
+                      {payment.status === 'COMPLETED' ? 'Aprovado' :
+                        payment.status === 'PENDING' ? 'Pendente' :
+                        payment.status === 'REJECTED' ? 'Rejeitado' :
+                        payment.status}
                     </span>
                   </td>
                 </tr>
               ))
             ) : (
               <tr>
-                <td colSpan="4" className="px-6 py-4 text-center text-sm text-gray-500">
+                <td colSpan="6" className="px-6 py-4 text-center text-sm text-gray-500">
                   Nenhum saque encontrado
                 </td>
               </tr>

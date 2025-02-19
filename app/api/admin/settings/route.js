@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import { prisma } from '@/lib/prisma'
+import { prisma } from '@/app/lib/prisma'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/app/api/auth/[...nextauth]/route'
 
@@ -15,11 +15,11 @@ export async function GET() {
     }
 
     let settings = await prisma.settings.findFirst()
-    
+
     if (!settings) {
       settings = await prisma.settings.create({
         data: {
-          withdrawalFee: 10
+          withdrawalFee: 10 // Taxa padrão de 10%
         }
       })
     }
@@ -28,7 +28,7 @@ export async function GET() {
   } catch (error) {
     console.error('Erro ao buscar configurações:', error)
     return NextResponse.json(
-      { error: 'Erro ao buscar configurações' },
+      { message: 'Erro ao buscar configurações', error: error.message },
       { status: 500 }
     )
   }
@@ -46,7 +46,6 @@ export async function PUT(request) {
     }
 
     const data = await request.json()
-    
     let settings = await prisma.settings.findFirst()
 
     if (settings) {
@@ -68,7 +67,7 @@ export async function PUT(request) {
   } catch (error) {
     console.error('Erro ao atualizar configurações:', error)
     return NextResponse.json(
-      { error: 'Erro ao atualizar configurações' },
+      { message: 'Erro ao atualizar configurações', error: error.message },
       { status: 500 }
     )
   }

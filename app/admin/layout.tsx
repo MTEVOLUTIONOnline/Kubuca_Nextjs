@@ -12,21 +12,17 @@ export const metadata: Metadata = {
   description: "Painel de controle do sistema Kubuca",
 }
 
-export default function RootLayout({
+export default function AdminLayout({
   children,
 }: {
   children: React.ReactNode
 }) {
   return (
-    <html lang="pt-BR">
-      <body className={inter.className}>
-        <div className="flex">
-          <AdminSidebar />
-          <div className="flex-1 p-6">
-            {children}
-          </div>
-        </div>
-      </body>
-    </html>
+    <div className="min-h-screen bg-gray-100 flex">
+      <AdminSidebar />
+      <main className=" flex-1">
+        {children}
+      </main>
+    </div>
   )
 }
