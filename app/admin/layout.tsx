@@ -1,8 +1,6 @@
 import type { Metadata } from "next"
-import { Inter } from "next/font/google"
 import AdminSidebar from "../components/admin/AdminSidebar"
 
-const inter = Inter({ subsets: ["latin"] })
 
 export const metadata: Metadata = {
   title: "ADMIN - KUBUCA",
@@ -20,7 +18,7 @@ export default function AdminLayout({
   return (
     <div className="min-h-screen bg-gray-100 flex">
       <AdminSidebar />
-      <main className=" flex-1">
+      <main className="flex-1">
         {children}
       </main>
     </div>

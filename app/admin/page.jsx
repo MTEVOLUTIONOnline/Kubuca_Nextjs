@@ -1,10 +1,8 @@
 'use client'
 import { useSession } from 'next-auth/react'
-// import AdminStats from '@/components/admin/AdminStats'
-// import AdminUsersList from '@/components/admin/AdminUsersList'
 import { redirect } from 'next/navigation'
 import { useState, useEffect } from 'react'
-import { FiUsers, FiDollarSign, FiShoppingCart, FiActivity, FiTrendingUp, FiClock } from 'react-icons/fi'
+import { FiUsers, FiDollarSign, FiClock } from 'react-icons/fi'
 
 export default function AdminDashboard() {
   const { data: session } = useSession()
@@ -18,20 +16,20 @@ export default function AdminDashboard() {
   console.log('Session:', session)
 
   useEffect(() => {
+    const fetchStats = async () => {
+      try {
+        const response = await fetch('/api/admin/stats')
+        const data = await response.json()
+        setStats(data)
+      } catch (error) {
+        console.error('Erro ao buscar estatísticas:', error)
+      } finally {
+        setLoading(false)
+      }
+    }
+
     fetchStats()
   }, [])
-
-  const fetchStats = async () => {
-    try {
-      const response = await fetch('/api/admin/stats')
-      const data = await response.json()
-      setStats(data)
-    } catch (error) {
-      console.error('Erro ao buscar estatísticas:', error)
-    } finally {
-      setLoading(false)
-    }
-  }
 
   if (loading) {
     return (

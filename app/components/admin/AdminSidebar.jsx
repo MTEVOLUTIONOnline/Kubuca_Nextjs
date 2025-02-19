@@ -3,7 +3,7 @@
 import { cn } from "@/lib/utils"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { LayoutDashboard, Users, CreditCard, GraduationCap, LinkIcon, WalletCards, BarChart3 } from "lucide-react"
+import { LayoutDashboard, Users, CreditCard, WalletCards, BarChart3 } from "lucide-react"
 
 export default function AdminSidebar() {
   const pathname = usePathname()

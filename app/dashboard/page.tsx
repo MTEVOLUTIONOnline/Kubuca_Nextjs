@@ -49,21 +49,21 @@ export default async function Dashboard() {
     }
   })
 
-  // Calcular estatísticas
-  const totalRevenue = coursesWithSales.reduce((sum, course) => 
-    sum + course.purchases.reduce((courseSum, purchase) => courseSum + purchase.amount, 0)
-  , 0)
+  // // Calcular estatísticas
+  // const totalRevenue = coursesWithSales.reduce((sum, course) => 
+  //   sum + course.purchases.reduce((courseSum, purchase) => courseSum + purchase.amount, 0)
+  // , 0)
 
-  const totalSales = coursesWithSales.reduce((sum, course) => 
-    sum + course._count.purchases
-  , 0)
+  // const totalSales = coursesWithSales.reduce((sum, course) => 
+  //   sum + course._count.purchases
+  // , 0)
 
-  const stats = {
-    totalRevenue,
-    totalSales,
-    totalCourses: coursesWithSales.length,
-    averageRevenuePerSale: totalSales > 0 ? totalRevenue / totalSales : 0
-  }
+  // const stats = {
+  //   totalRevenue,
+  //   totalSales,
+  //   totalCourses: coursesWithSales.length,
+  //   averageRevenuePerSale: totalSales > 0 ? totalRevenue / totalSales : 0
+  // }
 
   return (
     <div className="p-6">
@@ -91,14 +91,14 @@ export default async function Dashboard() {
         <ProductList courses={coursesWithSales} />
       </div>
       
-      {session?.user.role === 'ADMIN' && (
+      {/* {session?.user?.role === 'ADMIN' && (
         <Link 
           href="/admin"
           className="bg-purple-600 text-white px-4 py-2 rounded-md hover:bg-purple-700"
         >
           Acessar Painel Admin
         </Link>
-      )}
+      )} */}
     </div>
   )
 } 

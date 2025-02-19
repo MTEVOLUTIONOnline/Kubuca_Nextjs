@@ -1,7 +1,7 @@
 'use client'
 
-import { useState, useEffect } from 'react'
-import { FiCheck, FiX, FiSearch, FiChevronLeft, FiChevronRight, FiFilter } from 'react-icons/fi'
+import { useState, useEffect, useCallback } from 'react'
+import { FiSearch,  FiFilter } from 'react-icons/fi'
 import { Toaster, toast } from 'react-hot-toast'
 
 export default function AdminPayments() {
@@ -13,7 +13,7 @@ export default function AdminPayments() {
   const [search, setSearch] = useState('')
   const itemsPerPage = 10
 
-  const fetchPayments = async () => {
+  const fetchPayments = useCallback(async () => {
     try {
       const response = await fetch(
         `/api/admin/payments?page=${currentPage}&limit=${itemsPerPage}&status=${filter}&search=${search}`
@@ -26,11 +26,11 @@ export default function AdminPayments() {
       console.error('Erro ao buscar pagamentos:', error)
       setLoading(false)
     }
-  }
+  }, [currentPage, filter, search, itemsPerPage])
 
   useEffect(() => {
     fetchPayments()
-  }, [currentPage, filter, search])
+  }, [currentPage, filter, search, fetchPayments])
 
   const handleStatusChange = async (paymentId, newStatus) => {
     try {
@@ -122,7 +122,7 @@ export default function AdminPayments() {
                     <div className="text-sm font-medium text-gray-900">{payment.user.name}</div>
                     <div className="text-sm text-gray-500">{payment.user.email}</div>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                  <td className="px-6 py-4 whitespace-nowrap text-sm  text-gray-400">
                     {payment.amount.toLocaleString('pt-BR', { style: 'currency', currency: 'MZN' })}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">

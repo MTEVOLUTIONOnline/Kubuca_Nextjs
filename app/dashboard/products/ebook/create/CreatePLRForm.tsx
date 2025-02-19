@@ -31,6 +31,7 @@ export default function CreatePLRForm({ courses }: CreatePLRFormProps) {
     return null
   }
 
+  
   const userId = (session.user as any).id  // type assertion temporário
 
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {

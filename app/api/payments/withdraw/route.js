@@ -3,13 +3,6 @@ import { prisma } from '@/lib/prisma';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 
-// Constantes para status de pagamento
-const PAYMENT_STATUS = {
-  PENDING: 'PENDING',
-  COMPLETED: 'COMPLETED',
-  REJECTED: 'REJECTED',
-};
-
 export async function POST(request) {
   try {
     const session = await getServerSession(authOptions);
