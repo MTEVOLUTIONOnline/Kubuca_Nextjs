@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { FiArrowLeft, FiUser, FiMail, FiCalendar, FiClock, FiChevronLeft, FiChevronRight } from 'react-icons/fi'
+import { toast } from 'react-hot-toast'
 
 export default function UserDetails({ params }) {
   const router = useRouter()
@@ -13,6 +14,7 @@ export default function UserDetails({ params }) {
   const [totalPages, setTotalPages] = useState(0)
   const itemsPerPage = 8
 
+  console.log(user)
   const fetchUserDetails = async () => {
     try {
       const response = await fetch(`/api/admin/users/${params.id}?page=${currentPage}&limit=${itemsPerPage}`)
@@ -33,6 +35,28 @@ export default function UserDetails({ params }) {
       setLoading(false)
     }
   }
+
+  const handleFeeUpdate = async (newFee) => {
+    try {
+      const response = await fetch(`/api/admin/users/${params.id}/fee`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ withdrawalFee: parseFloat(newFee) }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Erro ao atualizar taxa');
+      }
+
+      fetchUserDetails();
+      toast.success('Taxa atualizada com sucesso');
+    } catch (error) {
+      console.error('Erro:', error);
+      toast.error('Erro ao atualizar taxa');
+    }
+  };
 
   useEffect(() => {
     fetchUserDetails()
@@ -184,6 +208,67 @@ export default function UserDetails({ params }) {
               ) : (
                 <p className="text-gray-500 text-sm">Nenhuma atividade registrada</p>
               )}
+            </div>
+
+            <div className="bg-gray-50 p-4 rounded-lg">
+              <h2 className="text-lg font-semibold text-gray-900 mb-4">Taxa de Saque</h2>
+              <div className="space-y-4">
+                <div className="flex items-center gap-4">
+                  <input
+                    type="number"
+                    min="0"
+                    step="0.01"
+                    defaultValue={user?.withdrawalFee}
+                    className="w-32 rounded-md border-gray-300"
+                    placeholder="Taxa (%)"
+                  />
+                  <button
+                    onClick={(e) => handleFeeUpdate(e.target.previousElementSibling.value)}
+                    className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+                  >
+                    Atualizar Taxa
+                  </button>
+                </div>
+                
+                <div className="text-sm text-gray-600">
+                  <p>
+                    {user?.withdrawalFee 
+                      ? `Taxa personalizada: ${user.withdrawalFee}%` 
+                      : `Usando taxa padrão: ${user?.defaultFee || 10}%`}
+                  </p>
+                </div>
+
+                {/* Histórico de Saques com Taxas */}
+                <div className="mt-4">
+                  <h3 className="text-md font-medium text-gray-800 mb-2">Últimos Saques</h3>
+                  <div className="space-y-2">
+                    {user?.payments?.map((payment, index) => (
+                      <div key={index} className="bg-white p-3 rounded-md shadow-sm">
+                        <div className="flex justify-between items-center">
+                          <span className="text-gray-600">
+                            {new Date(payment.createdAt).toLocaleDateString('pt-BR')}
+                          </span>
+                          <span className={`text-sm font-medium ${
+                            payment.status === 'COMPLETED' ? 'text-green-600' : 
+                            payment.status === 'PENDING' ? 'text-yellow-600' : 
+                            'text-red-600'
+                          }`}>
+                            {payment.status}
+                          </span>
+                        </div>
+                        <div className="mt-1">
+                          <span className="text-sm text-gray-500">
+                            Valor: {payment.amount.toLocaleString('pt-BR', { style: 'currency', currency: 'MZN' })}
+                          </span>
+                          <span className="text-sm text-gray-500 ml-4">
+                            Taxa: {payment.feePercentage}%
+                          </span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>

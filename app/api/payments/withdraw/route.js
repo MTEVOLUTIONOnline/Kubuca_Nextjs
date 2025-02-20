@@ -17,27 +17,28 @@ export async function POST(request) {
     const { 
       amount, 
       mpesaName, 
-      mpesaNumber, 
-      feeAmount, 
-      finalAmount, 
-      feePercentage 
+      mpesaNumber
     } = await request.json();
 
-    // Buscar usuário com saldo e pagamentos pendentes
-    const user = await prisma.user.findUnique({
-      where: { id: session.user.id },
-      select: { 
-        balance: true,
-        payments: {
-          where: {
-            status: 'PENDING'
-          },
-          select: {
-            amount: true
+    // Buscar usuário com sua taxa personalizada e configurações gerais
+    const [user, settings] = await Promise.all([
+      prisma.user.findUnique({
+        where: { id: session.user.id },
+        select: { 
+          balance: true,
+          withdrawalFee: true,
+          payments: {
+            where: {
+              status: 'PENDING'
+            },
+            select: {
+              amount: true
+            }
           }
         }
-      }
-    });
+      }),
+      prisma.settings.findFirst()
+    ]);
 
     if (!user) {
       return NextResponse.json(
@@ -46,11 +47,15 @@ export async function POST(request) {
       );
     }
 
-    // Calcular saldo disponível (descontando pagamentos pendentes)
+    // Usar taxa personalizada ou padrão
+    const feePercentage = user.withdrawalFee ?? settings.withdrawalFee;
+    const feeAmount = (amount * feePercentage) / 100;
+    const finalAmount = amount - feeAmount;
+
+    // Calcular saldo disponível
     const pendingAmount = user.payments.reduce((sum, payment) => sum + payment.amount, 0);
     const availableBalance = user.balance - pendingAmount;
 
-    // Verificar se tem saldo suficiente
     if (availableBalance < amount) {
       return NextResponse.json(
         { error: 'Saldo insuficiente. Considere os saques pendentes.' },
@@ -71,9 +76,6 @@ export async function POST(request) {
         feePercentage
       }
     });
-
-    // Não vamos mais decrementar o saldo aqui
-    // O saldo só será decrementado quando o admin aprovar o saque
 
     return NextResponse.json(payment);
   } catch (error) {

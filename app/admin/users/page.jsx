@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { FiEdit2, FiTrash2, FiEye } from 'react-icons/fi'
+import { FiEdit2, FiTrash2, FiEye, FiSearch } from 'react-icons/fi'
 import { useRouter } from 'next/navigation'
 
 export default function Users() {
@@ -9,14 +9,20 @@ export default function Users() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
   const router = useRouter()
+  const [searchEmail, setSearchEmail] = useState('')
+  const [currentPage, setCurrentPage] = useState(1)
+  const [totalPages, setTotalPages] = useState(0)
+  const itemsPerPage = 10
 
   useEffect(() => {
     fetchUsers()
-  }, [])
+  }, [currentPage, searchEmail])
 
   const fetchUsers = async () => {
     try {
-      const response = await fetch('/api/admin/users')
+      const response = await fetch(
+        `/api/admin/users?page=${currentPage}&limit=${itemsPerPage}&search=${searchEmail}`
+      )
       
       if (!response.ok) {
         const errorData = await response.json()
@@ -24,7 +30,8 @@ export default function Users() {
       }
       
       const data = await response.json()
-      setUsers(Array.isArray(data) ? data : [])
+      setUsers(data.users)
+      setTotalPages(Math.ceil(data.total / itemsPerPage))
       setError(null)
     } catch (error) {
       console.error('Erro ao buscar usuários:', error)
@@ -36,6 +43,12 @@ export default function Users() {
 
   const handleViewUser = (userId) => {
     router.push(`/admin/users/${userId}`)
+  }
+
+  const handleSearch = (e) => {
+    e.preventDefault()
+    setCurrentPage(1) // Reset para primeira página ao pesquisar
+    fetchUsers()
   }
 
   if (loading) {
@@ -69,11 +82,22 @@ export default function Users() {
 
   return (
     <div className="p-6">
-      <div className="flex justify-between items-center mb-6">
+      <div className="mb-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <h1 className="text-2xl font-semibold text-gray-800">Usuários</h1>
-        <button disabled className="bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white px-4 py-2 rounded-lg transition-colors">
-          Adicionar Usuário
-        </button>
+        
+        {/* Campo de Pesquisa */}
+        <form onSubmit={handleSearch} className="w-full sm:w-auto">
+          <div className="relative">
+            <input
+              type="text"
+              value={searchEmail}
+              onChange={(e) => setSearchEmail(e.target.value)}
+              placeholder="Buscar por email..."
+              className="w-full sm:w-64 pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
+            />
+            <FiSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+          </div>
+        </form>
       </div>
 
       <div className="bg-white rounded-lg shadow overflow-hidden">
@@ -142,6 +166,28 @@ export default function Users() {
           </tbody>
         </table>
       </div>
+
+      {/* Paginação */}
+      {totalPages > 1 && (
+        <div className="bg-white px-4 py-3 flex items-center justify-between border-t border-gray-200">
+          <div className="flex-1 flex justify-between">
+            <button
+              onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+              disabled={currentPage === 1}
+              className="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50"
+            >
+              Anterior
+            </button>
+            <button
+              onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+              disabled={currentPage === totalPages}
+              className="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50"
+            >
+              Próximo
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

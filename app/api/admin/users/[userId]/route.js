@@ -36,6 +36,7 @@ export async function GET(request) {
         email: true,
         createdAt: true,
         active: true,
+        withdrawalFee: true,
         lastLogin: true,
         activities: {
           orderBy: {

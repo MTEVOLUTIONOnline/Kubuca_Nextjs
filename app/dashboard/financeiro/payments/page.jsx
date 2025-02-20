@@ -10,26 +10,34 @@ export default function Payments() {
   const [withdrawalFee, setWithdrawalFee] = useState(10) // Taxa padrão de 10%
   const [finalAmount, setFinalAmount] = useState(0)
   const [feeAmount, setFeeAmount] = useState(0)
+  const [userWithdrawalFee, setUserWithdrawalFee] = useState(null)
 
   const [formData, setFormData] = useState({
     mpesaName: '',
     mpesaNumber: ''
   })
 
-  // Buscar a taxa de saque das configurações
+  // Buscar a taxa do usuário e a taxa padrão
   useEffect(() => {
-    const fetchSettings = async () => {
+    const fetchUserSettings = async () => {
       try {
-        const response = await fetch('/api/admin/settings')
-        const data = await response.json()
-        if (data.withdrawalFee) {
-          setWithdrawalFee(data.withdrawalFee)
+        // Primeiro busca o usuário para ver se tem taxa personalizada
+        const userResponse = await fetch('/api/users/me')
+        const userData = await userResponse.json()
+        
+        // Se o usuário não tem taxa personalizada, busca a taxa padrão
+        if (userData.withdrawalFee === null) {
+          const settingsResponse = await fetch('/api/admin/settings')
+          const settingsData = await settingsResponse.json()
+          setWithdrawalFee(settingsData.withdrawalFee)
+        } else {
+          setWithdrawalFee(userData.withdrawalFee)
         }
       } catch (error) {
         console.error('Erro ao buscar configurações:', error)
       }
     }
-    fetchSettings()
+    fetchUserSettings()
   }, [])
 
   // Calcular valores quando o amount ou withdrawalFee mudar
@@ -152,7 +160,8 @@ export default function Payments() {
           {amount && (
             <div className="mt-4 p-4 bg-gray-50 rounded-md">
               <p className="text-sm text-gray-600">
-                Taxa de saque: {withdrawalFee}%
+                Taxa de saque: {withdrawalFee}% 
+                {userWithdrawalFee !== null && <span className="text-xs text-gray-500 ml-2">(Taxa personalizada)</span>}
               </p>
               <p className="text-sm text-gray-600">
                 Valor da taxa: MT {feeAmount.toFixed(2)}
