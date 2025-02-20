@@ -52,3 +52,9 @@ PROBLEMAS NAO CONCLUIDOS:
 
 
  
+-erros [
+    -atualizar o curso
+    - criar ebook
+] 
+
+NB: precos

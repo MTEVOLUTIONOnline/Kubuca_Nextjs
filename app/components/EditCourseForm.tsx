@@ -55,7 +55,7 @@ export default function EditCourseForm({ course }: { course: Course }) {
       })
 
       if (response.ok) {
-        router.push('/dashboard/courses')
+        router.push('/dashboard/products/courses')
         router.refresh()
       } else {
         alert('Erro ao atualizar o curso')

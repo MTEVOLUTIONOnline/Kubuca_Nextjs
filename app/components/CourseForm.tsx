@@ -105,7 +105,7 @@ export default function CourseForm() {
       }
 
       toast.success('Curso criado com sucesso!')
-      router.push('/dashboard/products/ebook')
+      router.push('/dashboard/products/courses')
       router.refresh()
     } catch (error) {
       console.error('Erro ao criar curso:', error)

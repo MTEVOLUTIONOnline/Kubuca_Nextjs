@@ -63,7 +63,7 @@ export default async function ModuleLessonsPage({ params }) {
             <p className="text-gray-600 mt-1">Curso: {module.course.title}</p>
           </div>
           <Link 
-            href={`/dashboard/courses/${params.id}/modules/${module.id}/lessons/create`}
+            href={`/dashboard/products/courses/${params.id}/modules/${module.id}/lessons/create`}
             className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
           >
             Adicionar Aula

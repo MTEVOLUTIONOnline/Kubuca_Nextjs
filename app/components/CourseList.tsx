@@ -43,7 +43,7 @@ export default function CourseList({ courses }: { courses: Course[] }) {
       <div className="text-center py-10">
         <p className="text-gray-500">Você ainda não tem nenhum curso.</p>
         <Link 
-          href="/dashboard/courses/create"
+          href="/dashboard/products/courses/create"
           className="text-blue-500 hover:underline mt-2 inline-block"
         >
           Criar meu primeiro curso
@@ -77,13 +77,13 @@ export default function CourseList({ courses }: { courses: Course[] }) {
             <div className="flex justify-between items-center">
               <div className="space-x-2">
                 <Link
-                  href={`/dashboard/courses/${course.id}/edit`}
+                  href={`/dashboard/products/courses/${course.id}/edit`}
                   className="text-blue-500 hover:underline"
                 >
                   Editar
                 </Link>
                 <Link
-                  href={`/dashboard/courses/${course.id}/modules`}
+                  href={`/dashboard/products/courses/${course.id}/modules`}
                   className="text-green-500 hover:underline"
                 >
                   Módulos

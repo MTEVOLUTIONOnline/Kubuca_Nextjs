@@ -9,12 +9,12 @@ export default function Hero() {
       <div className="container mx-auto px-4 pt-40">
         <div className="grid lg:grid-cols-2 gap-12 items-center">
           <div className="space-y-8">
-            <h1 className="text-5xl font-bold leading-tight">Venda seu curso online</h1>
+            <h1 className="text-5xl font-bold leading-tight">Venda seu curso <br /> online</h1>
             <p className="text-xl text-gray-600">
               Transforme o seu conhecimento em um curso <br /> online e crie seu negócio na internet
-            </p>
+            </p><br />
             <Link href="/register" className="mt-6">
-              <Button size="lg" className="bg-[#00C49A] hover:bg-[#00B389] text-white">
+              <Button size="lg" className="bg-[#00C49A]  hover:bg-[#00B389] text-white">
                 Cadastrar agora
               </Button>
             </Link>

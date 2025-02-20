@@ -24,7 +24,7 @@ export default function ModuleForm({ courseId }: { courseId: string }) {
       })
 
       if (response.ok) {
-        router.push(`/dashboard/courses/${courseId}/modules`)
+        router.push(`/dashboard/products/courses/${courseId}/modules`)
         router.refresh()
       }
     } catch (error) {

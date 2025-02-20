@@ -65,13 +65,13 @@ export default function ModuleList({
             </div>
             <div className="space-x-2">
               <Link
-                href={`/dashboard/courses/${courseId}/modules/${module.id}/edit`}
+                href={`/dashboard/products/courses/${courseId}/modules/${module.id}/edit`}
                 className="text-blue-500 hover:underline"
               >
                 Editar
               </Link>
               <Link
-                href={`/dashboard/courses/${courseId}/modules/${module.id}/lessons`}
+                href={`/dashboard/products/courses/${courseId}/modules/${module.id}/lessons`}
                 className="text-green-500 hover:underline"
               >
                 Aulas

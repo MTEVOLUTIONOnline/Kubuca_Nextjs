@@ -52,7 +52,7 @@ export default function LessonForm({
       })
 
       if (response.ok) {
-        router.push(`/dashboard/courses/${courseId}/modules/${moduleId}/lessons`)
+        router.push(`/dashboard/products/courses/${courseId}/modules/${moduleId}/lessons`)
         router.refresh()
       } else {
         alert('Erro ao criar a aula')

@@ -37,7 +37,7 @@ export default function EditModuleForm({
       })
 
       if (response.ok) {
-        router.push(`/dashboard/courses/${courseId}/modules`)
+        router.push(`/dashboard/products/courses/${courseId}/modules`)
         router.refresh()
       } else {
         alert('Erro ao atualizar o módulo')
@@ -77,7 +77,7 @@ export default function EditModuleForm({
       <div className="flex justify-between">
         <button
           type="button"
-          onClick={() => router.push(`/dashboard/courses/${courseId}/modules`)}
+          onClick={() => router.push(`/dashboard/products/courses/${courseId}/modules`)}
           className="px-4 py-2 text-gray-600 hover:text-gray-800"
         >
           Cancelar
