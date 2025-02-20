@@ -82,11 +82,10 @@ export default function DashboardSidebar() {
               <li key={item.href}>
                 <Link
                   href={item.href}
-                  className={`flex items-center space-x-2 px-3 py-2 mx-2 rounded-lg transition ${
-                    isActive
+                  className={`flex items-center space-x-2 px-3 py-2 mx-2 rounded-lg transition ${isActive
                       ? 'bg-blue-50 text-blue-600'
                       : 'text-gray-700 hover:bg-gray-50'
-                  }`}
+                    }`}
                 >
                   {item.icon}
                   <span className="font-medium text-sm">{item.label}</span>
@@ -107,16 +106,18 @@ export default function DashboardSidebar() {
         </ul>
       </nav>
 
-      {/* Perfil e Logout */}
+      {/* Perfil e Logout  Settings*/}
       <div className="p-3 border-t">
-        <div className="mb-2">
-          <p className="text-sm font-medium text-gray-900">
-            {session?.user?.name || 'Usuário'}
-          </p>
-          <p className="text-xs text-gray-500">
-            {session?.user?.email}
-          </p>
-        </div>
+        <Link href="/dashboard/settings">
+          <div className="mb-2">
+            <p className="text-sm font-medium text-gray-900">
+              {session?.user?.name || 'Usuário'}
+            </p>
+            <p className="text-xs text-gray-500">
+              {session?.user?.email}
+            </p>
+          </div>
+        </Link>
         <Link
           href="/api/auth/signout"
           className="flex items-center space-x-2 px-3 py-2 text-sm text-gray-700 rounded-lg hover:bg-gray-50 transition"
